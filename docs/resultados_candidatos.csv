@@ -1,0 +1,10 @@
+,fase,familia,train_wape,cv_wape_mean,cv_wape_std,brecha_wape,learning_rate,fit_seconds,cv_mae_mean,cv_costo_negocio,cv_recall_sobrecarga,supera_lineas_base,mejora_vs_regla_en_desv
+ridge,candidato,lineal_regularizado,0.3434,0.3794,0.0354,0.036,,0.0027,2.2237,238.79,0.4833,True,0.8861
+mlp,candidato,red_neuronal,0.3129,0.3923,0.0428,0.0794,0.001,0.1427,2.2976,242.2,0.5,True,0.4298
+chronos2_zero_shot,candidato,fundacional,,0.4093,0.0416,,,0.0007,2.4007,259.99,0.4833,True,0.0349
+random_forest,candidato,bagging,0.144,0.4102,0.0281,0.2662,,0.0523,2.4001,221.39,0.5667,True,0.0188
+regla_prom_4_semanas,baseline,negocio,0.4081,0.4107,0.0286,0.0026,,0.0001,2.405,214.2,0.5833,False,0.0
+llm_claude_haiku,candidato,llm,,0.4108,0.0372,,,0.0004,2.4075,225.93,0.55,False,-0.0025
+lightgbm,candidato,boosting,0.206,0.4164,0.0331,0.2104,0.1,0.2957,2.437,253.56,0.5167,False,-0.1713
+hist_gradient_boosting,candidato,boosting,0.2085,0.421,0.0354,0.2125,0.1,0.5458,2.4645,263.4,0.5,False,-0.2906
+dummy_mediana,baseline,ingenua,0.495,0.5102,0.052,0.0152,,0.0001,2.9933,431.4,0.0,False,-1.9136

@@ -74,4 +74,5 @@ for nb in notebooks/0*.ipynb; do .venv/bin/jupyter nbconvert --to notebook --exe
 - Semilla fija (`SEMILLA = 42`) en los modelos y en el muestreador de Optuna.
 - Cada corrida registra el commit de Git del código en `src/`. Si había cambios sin commitear, el valor lleva `-dirty`.
 - Chronos-2 se descarga de Hugging Face (`amazon/chronos-2`) la primera vez y corre en un proceso aparte, porque el OpenMP de torch choca con el de LightGBM dentro del mismo kernel.
-- Las respuestas de un LLM no son deterministas. Por eso se guarda cada prompt con su respuesta, y la corrida se reproduce desde ese archivo.
+- Las respuestas de un LLM no son deterministas. Por eso se guarda cada prompt con su respuesta, y la corrida se reproduce desde ese archivo. `docs/llm/` tiene 6 archivos: uno por cada semana de validación de la CV y uno de la predicción con la que MLflow valida el ejemplo de entrada al guardar el modelo. El costo total fue de unos 2 centavos.
+- `docs/figuras/candidatos_comparacion.png` se regeneró desde `docs/resultados_candidatos.csv` solo para mover la leyenda, que tapaba una barra. Así no hubo que volver a ejecutar el notebook 03, lo que habría creado corridas nuevas en MLflow.

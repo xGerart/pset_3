@@ -1,0 +1,4 @@
+,test_wape,test_mae,test_costo_negocio,test_costo_negocio_umbral8,test_horas_sobrecarga_detectadas,test_horas_sobrecarga_perdidas,test_refuerzos_innecesarios,test_recall_sobrecarga,umbral_decision,inferencia_ms_139_filas,fit_seconds
+ridge,0.3635456015130597,2.356507819879617,83.26,87.04,9.0,9.0,7.0,0.5,6.75,1.3097324990667403,0.0027444580337032676
+mlp,0.3582486671685628,2.3221730152437057,84.78,82.5,11.0,7.0,13.0,0.6111111111111112,6.0,1.2721891794353724,0.14270491700153798
+regla PSet 1 (referencia),0.3941916389197188,2.55515587529976,75.31,75.31,9.0,9.0,4.0,0.5,8.0,,
