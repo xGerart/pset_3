@@ -70,7 +70,11 @@ def registrar(nombre: str, modelo, resultado: Resultado, *, fase: str, familia: 
                          "modelo_clase": type(modelo.named_steps["modelo"] if hasattr(modelo, "named_steps") else modelo).__name__})
         if guardar_modelo:
             ejemplo = train[ENTRADA].head(5)
-            firma = infer_signature(ejemplo, resultado.modelo.predict(train[ENTRADA]).astype(float)[:5])
+            # La firma solo necesita el tipo de la salida: se toma de las predicciones fuera de
+            # pliegue. Predecir sobre el entrenamiento no tiene sentido para un modelo zero-shot
+            # (Chronos o el LLM pronostican lo que viene DESPUÉS de su historia).
+            salida = resultado.oof[~np.isnan(resultado.oof)][:5].astype(float)
+            firma = infer_signature(ejemplo, salida)
             # cloudpickle + src/ empaquetado: las clases propias (regla, Chronos, LLM) se
             # cargan desde models:/ en un entorno limpio. skops no admite clases propias.
             mlflow.sklearn.log_model(resultado.modelo, name="modelo", signature=firma,
