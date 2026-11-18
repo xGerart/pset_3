@@ -22,14 +22,18 @@ services:
   mlflow:
     image: pset3-mlflow:3.18.0
     build: ./mlflow
+    # La URI con la contraseña va por variable de entorno, no en los argumentos del proceso.
+    environment:
+      MLFLOW_BACKEND_STORE_URI: postgresql://mlflow:${MLFLOW_DB_PASSWORD}@mlflow-postgres:5432/mlflow
     command: >
       mlflow server
       --host 0.0.0.0 --port 5000
-      --backend-store-uri postgresql://mlflow:${MLFLOW_DB_PASSWORD}@mlflow-postgres:5432/mlflow
       --serve-artifacts --artifacts-destination /mlartifacts
-      --allowed-hosts localhost:*,127.0.0.1:*,mlflow:*
+      --allowed-hosts localhost:*,127.0.0.1:*
     ports:
-      - "5050:5000"   # el 5000 lo ocupa AirPlay en macOS
+      # Solo loopback: el servidor no tiene autenticación, así que no se expone a la red.
+      # (El 5000 lo ocupa AirPlay en macOS.)
+      - "127.0.0.1:5050:5000"
     volumes:
       - mlflow-artifacts:/mlartifacts
     depends_on:

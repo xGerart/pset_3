@@ -25,17 +25,18 @@ MODELO_REGISTRADO = f"{EXPERIMENTO}-modelo"
 
 def configurar() -> str:
     load_dotenv(RAIZ / ".env")
-    uri = os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5050")
+    uri = os.environ["MLFLOW_TRACKING_URI"]   # definido en .env (ver .env.example)
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(EXPERIMENTO)
     return uri
 
 
 def commit_git() -> str:
-    """Commit del código que generó la corrida; '-dirty' si había cambios sin commitear."""
+    """Commit del código que generó la corrida; '-dirty' si src/ tenía cambios sin
+    commitear. Los notebooks no cuentan: al ejecutarlos cambian sus salidas, no su código."""
     sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=RAIZ, capture_output=True,
                          text=True, check=True).stdout.strip()
-    sucio = subprocess.run(["git", "status", "--porcelain", "--", "src", "notebooks"],
+    sucio = subprocess.run(["git", "status", "--porcelain", "--", "src"],
                            cwd=RAIZ, capture_output=True, text=True, check=True).stdout.strip()
     return sha + ("-dirty" if sucio else "")
 
@@ -70,6 +71,9 @@ def registrar(nombre: str, modelo, resultado: Resultado, *, fase: str, familia: 
         if guardar_modelo:
             ejemplo = train[ENTRADA].head(5)
             firma = infer_signature(ejemplo, resultado.modelo.predict(train[ENTRADA]).astype(float)[:5])
+            # cloudpickle + src/ empaquetado: las clases propias (regla, Chronos, LLM) se
+            # cargan desde models:/ en un entorno limpio. skops no admite clases propias.
             mlflow.sklearn.log_model(resultado.modelo, name="modelo", signature=firma,
-                                     input_example=ejemplo)
+                                     input_example=ejemplo, serialization_format="cloudpickle",
+                                     code_paths=[str(RAIZ / "src")])
         return run.info.run_id
