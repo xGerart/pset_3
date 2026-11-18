@@ -1,0 +1,46 @@
+# MLflow para el PSet 3: servidor de tracking + Model Registry.
+#   backend store  -> Postgres (experimentos, corridas, métricas, registro de modelos)
+#   artifact store -> volumen mlflow-artifacts, servido por el propio servidor (--serve-artifacts),
+#                     así los clientes suben artefactos por HTTP y no necesitan acceso al disco.
+name: pset3
+
+services:
+  mlflow-postgres:
+    image: postgres:16.10
+    environment:
+      POSTGRES_DB: mlflow
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: ${MLFLOW_DB_PASSWORD:?define MLFLOW_DB_PASSWORD en .env}
+    volumes:
+      - mlflow-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d mlflow -U mlflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mlflow:
+    image: pset3-mlflow:3.18.0
+    build: ./mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0 --port 5000
+      --backend-store-uri postgresql://mlflow:${MLFLOW_DB_PASSWORD}@mlflow-postgres:5432/mlflow
+      --serve-artifacts --artifacts-destination /mlartifacts
+      --allowed-hosts localhost:*,127.0.0.1:*,mlflow:*
+    ports:
+      - "5050:5000"   # el 5000 lo ocupa AirPlay en macOS
+    volumes:
+      - mlflow-artifacts:/mlartifacts
+    depends_on:
+      mlflow-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  mlflow-postgres:
+  mlflow-artifacts:
